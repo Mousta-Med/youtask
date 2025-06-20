@@ -26,9 +26,9 @@ public abstract class BaseController<Request, Id, Response, Service extends Base
     }
 
 
-    @GetMapping("/{num}")
-    public ResponseEntity<Response> findOne(@PathVariable Id num) {
-        return ResponseEntity.ok(service.findOne(num));
+    @GetMapping("/{id}")
+    public ResponseEntity<Response> findOne(@PathVariable Id id) {
+        return ResponseEntity.ok(service.findOne(id));
     }
 
 
@@ -37,15 +37,15 @@ public abstract class BaseController<Request, Id, Response, Service extends Base
         return ResponseEntity.ok(service.save(userDto));
     }
 
-    @PutMapping("/{num}")
-    public ResponseEntity<Response> update(@PathVariable Id num, @RequestBody @Valid Request userDto) {
-        return ResponseEntity.ok(service.update(num, userDto));
+    @PutMapping("/{id}")
+    public ResponseEntity<Response> update(@PathVariable Id id, @RequestBody @Valid Request userDto) {
+        return ResponseEntity.ok(service.update(id, userDto));
     }
 
 
-    @DeleteMapping("/{num}")
-    public ResponseEntity<Void> delete(@PathVariable(name = "num") Id num) {
-        service.delete(num);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable(name = "id") Id id) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
