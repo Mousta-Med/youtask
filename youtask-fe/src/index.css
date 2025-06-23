@@ -14,3 +14,19 @@
 [data-rfd-draggable-id] {
     transition: transform 0.2s ease;
 }
+
+.submit-color {
+    --tw-ring-color: oklch(62.3% 0.214 259.815 / 0.5)
+}
+
+.input-ring {
+    --tw-ring-color: oklch(62.3% 0.214 259.815 / 0.2)
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+}

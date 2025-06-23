@@ -5,6 +5,7 @@ import type { Task } from "../models/Task.model";
 import TaskService from "../services/TaskService";
 import TaskSection from "../components/TaskSection";
 import toast from "react-hot-toast";
+import AddTaskModal from "../components/AddTaskModal";
 import { AxiosError } from "axios";
 import {
   PlusIcon,
@@ -14,10 +15,42 @@ import {
 } from "@heroicons/react/24/outline";
 
 const TaskManagerPage: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing] = useState(false);
+
+  const handleAddTask = async (newTask: Task) => {
+    try {
+      const response = await TaskService.create(newTask);
+      const createdTask = response.data;
+      setTasks((prev) => [...prev, createdTask]);
+      toast.success("Task added successfully");
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to add task";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleDeleteTask = async (id: string) => {
+    try {
+      await TaskService.remove(id);
+      setTasks((prev) => prev.filter((task) => task.id !== id));
+      toast.success("Task deleted successfully");
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to delete task";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
 
   const fetchTasks = async () => {
     try {
@@ -151,6 +184,11 @@ const TaskManagerPage: React.FC = () => {
 
   return (
     <div className="p-4 mx-auto max-w-7xl md:p-6">
+      <AddTaskModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddTask={handleAddTask}
+      />
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div className="flex flex-col items-center px-4 py-5 xl:px-6 xl:py-6">
           <div className="flex flex-col w-full gap-5 sm:justify-between xl:flex-row xl:items-center">
@@ -158,7 +196,10 @@ const TaskManagerPage: React.FC = () => {
               Task List
             </h2>
             <div className="flex flex-wrap items-center gap-3 xl:justify-end">
-              <button className="inline-flex items-center justify-center gap-2 rounded-lg transition px-4 py-3 text-sm bg-blue-500 text-white shadow-sm hover:bg-blue-600 disabled:bg-blue-300">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-lg transition px-4 py-3 text-sm bg-blue-500 text-white shadow-sm hover:bg-blue-600 disabled:bg-blue-300"
+              >
                 Add New Task
                 <PlusIcon className="w-4 h-4" />
               </button>
@@ -176,7 +217,10 @@ const TaskManagerPage: React.FC = () => {
               Get started by creating your first task. You can organize your
               work and track progress easily.
             </p>
-            <button className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
               <PlusIcon className="w-4 h-4" />
               Create Your First Task
             </button>
@@ -191,6 +235,7 @@ const TaskManagerPage: React.FC = () => {
                   tasks={taskGroups.PENDING}
                   count={taskCounts.PENDING}
                   onToggleComplete={toggleTaskComplete}
+                  onDelete={handleDeleteTask}
                 />
 
                 <TaskSection
@@ -199,6 +244,7 @@ const TaskManagerPage: React.FC = () => {
                   tasks={taskGroups.IN_PROGRESS}
                   count={taskCounts.IN_PROGRESS}
                   onToggleComplete={toggleTaskComplete}
+                  onDelete={handleDeleteTask}
                 />
 
                 <TaskSection
@@ -207,6 +253,7 @@ const TaskManagerPage: React.FC = () => {
                   tasks={taskGroups.COMPLETED}
                   count={taskCounts.COMPLETED}
                   onToggleComplete={toggleTaskComplete}
+                  onDelete={handleDeleteTask}
                 />
               </>
             </DragDropContext>
