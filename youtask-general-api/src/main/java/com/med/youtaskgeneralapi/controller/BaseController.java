@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173,"})
 public abstract class BaseController<Request, Id, Response, Service extends BaseService<Request, Id, Response>> {
 
     private final Service service;
