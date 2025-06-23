@@ -12,9 +12,15 @@ interface TaskItemProps {
   task: Task;
   index: number;
   onDelete: (id: string) => void;
+  onEdit: (task: Task) => void;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, index, onDelete }) => {
+const TaskItem: React.FC<TaskItemProps> = ({
+  task,
+  index,
+  onDelete,
+  onEdit,
+}) => {
   const isCompleted = task.status === "COMPLETED";
 
   const formatDate = (dateString?: string) => {
@@ -74,6 +80,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, index, onDelete }) => {
                       className="p-2 text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-all duration-200"
                       aria-label="Edit task"
                       title="Edit task"
+                      onClick={() => onEdit(task)}
                     >
                       <PencilIcon className="w-4 h-4" />
                     </button>

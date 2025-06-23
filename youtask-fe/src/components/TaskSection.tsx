@@ -10,6 +10,7 @@ interface TaskSectionProps {
   count: number;
   onToggleComplete: (taskId: string) => void;
   onDelete: (id: string) => void;
+  onEdit: (task: Task) => void;
 }
 
 const TaskSection: React.FC<TaskSectionProps> = ({
@@ -18,6 +19,7 @@ const TaskSection: React.FC<TaskSectionProps> = ({
   tasks,
   count,
   onDelete,
+  onEdit,
 }) => {
   const getSectionBadgeStyles = (
     status: "PENDING" | "IN_PROGRESS" | "COMPLETED"
@@ -64,6 +66,7 @@ const TaskSection: React.FC<TaskSectionProps> = ({
                 task={task}
                 index={index}
                 onDelete={onDelete}
+                onEdit={onEdit}
               />
             ))}
             {provided.placeholder}

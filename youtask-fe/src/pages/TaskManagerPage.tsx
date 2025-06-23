@@ -20,6 +20,28 @@ const TaskManagerPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const handleEditTask = (task: Task) => {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateTask = async (updatedTask: Task) => {
+    try {
+      const response = await TaskService.update(updatedTask.id, updatedTask);
+      const updatedTaskData = response.data;
+      setTasks((prev) => [...prev, updatedTaskData]);
+      toast.success("Task added successfully");
+      fetchTasks();
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to add task";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
 
   const handleAddTask = async (newTask: Task) => {
     try {
@@ -105,7 +127,6 @@ const TaskManagerPage: React.FC = () => {
     const newStatus = task.status === "COMPLETED" ? "PENDING" : "COMPLETED";
     await updateTaskStatus(id, newStatus);
   };
-
   const taskGroups = useMemo(() => {
     return {
       PENDING: tasks.filter((task) => task.status === "PENDING"),
@@ -123,7 +144,6 @@ const TaskManagerPage: React.FC = () => {
     }),
     [tasks]
   );
-
   const handleDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
@@ -141,6 +161,28 @@ const TaskManagerPage: React.FC = () => {
         draggableId,
         destination.droppableId as "PENDING" | "IN_PROGRESS" | "COMPLETED"
       );
+    } else {
+      // Handle reordering within the same section
+      const sourceStatus = source.droppableId as
+        | "PENDING"
+        | "IN_PROGRESS"
+        | "COMPLETED";
+      const sourceTasks = tasks.filter((task) => task.status === sourceStatus);
+      const otherTasks = tasks.filter((task) => task.status !== sourceStatus);
+
+      // Create a new array with reordered tasks
+      const reorderedSourceTasks = Array.from(sourceTasks);
+      const [movedTask] = reorderedSourceTasks.splice(source.index, 1);
+      reorderedSourceTasks.splice(destination.index, 0, movedTask);
+
+      // Combine all tasks back together
+      const newTasks = [...otherTasks, ...reorderedSourceTasks];
+
+      // Update local state immediately for better UX
+      setTasks(newTasks);
+
+      // Optional: Add API call here if your backend supports task ordering
+      // You could add a position field to your Task model and update it
     }
   };
 
@@ -188,6 +230,8 @@ const TaskManagerPage: React.FC = () => {
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAddTask={handleAddTask}
+        onUpdateTask={handleUpdateTask}
+        selectedTask={selectedTask}
       />
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div className="flex flex-col items-center px-4 py-5 xl:px-6 xl:py-6">
@@ -197,7 +241,10 @@ const TaskManagerPage: React.FC = () => {
             </h2>
             <div className="flex flex-wrap items-center gap-3 xl:justify-end">
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  setSelectedTask(null);
+                  setIsModalOpen(true);
+                }}
                 className="inline-flex items-center justify-center gap-2 rounded-lg transition px-4 py-3 text-sm bg-blue-500 text-white shadow-sm hover:bg-blue-600 disabled:bg-blue-300"
               >
                 Add New Task
@@ -218,7 +265,10 @@ const TaskManagerPage: React.FC = () => {
               work and track progress easily.
             </p>
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setIsModalOpen(true);
+                setSelectedTask(null);
+              }}
               className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
               <PlusIcon className="w-4 h-4" />
@@ -236,6 +286,7 @@ const TaskManagerPage: React.FC = () => {
                   count={taskCounts.PENDING}
                   onToggleComplete={toggleTaskComplete}
                   onDelete={handleDeleteTask}
+                  onEdit={handleEditTask}
                 />
 
                 <TaskSection
@@ -245,6 +296,7 @@ const TaskManagerPage: React.FC = () => {
                   count={taskCounts.IN_PROGRESS}
                   onToggleComplete={toggleTaskComplete}
                   onDelete={handleDeleteTask}
+                  onEdit={handleEditTask}
                 />
 
                 <TaskSection
@@ -254,6 +306,7 @@ const TaskManagerPage: React.FC = () => {
                   count={taskCounts.COMPLETED}
                   onToggleComplete={toggleTaskComplete}
                   onDelete={handleDeleteTask}
+                  onEdit={handleEditTask}
                 />
               </>
             </DragDropContext>

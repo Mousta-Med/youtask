@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -8,42 +8,73 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useForm } from "react-hook-form";
 import type { Task } from "../models/Task.model";
 
 interface AddTaskModalProps {
   open: boolean;
   onClose: () => void;
   onAddTask: (task: Task) => void;
+  onUpdateTask: (task: Task) => void;
+  selectedTask?: Task | null;
 }
+
+type FormValues = {
+  title: string;
+  description: string;
+};
 
 const AddTaskModal: React.FC<AddTaskModalProps> = ({
   open,
   onClose,
   onAddTask,
+  onUpdateTask,
+  selectedTask,
 }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const isEditMode = !!selectedTask;
 
-  const handleAdd = () => {
-    if (title.trim() && description.trim()) {
-      const newTask: Task = {
-        title: title.trim(),
-        description: description.trim(),
-        status: "PENDING",
-        createdDate: new Date().toISOString(),
-      };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid }, // ✅ extract isValid
+  } = useForm<FormValues>({
+    mode: "onChange", // ✅ to update validity on typing
+  });
 
-      onAddTask(newTask);
-      setTitle("");
-      setDescription("");
-      onClose();
+  useEffect(() => {
+    if (isEditMode && selectedTask) {
+      reset({
+        title: selectedTask.title,
+        description: selectedTask.description,
+      });
+    } else {
+      reset({
+        title: "",
+        description: "",
+      });
     }
+  }, [selectedTask, isEditMode, open, reset]);
+
+  const onSubmit = (data: FormValues) => {
+    if (isEditMode && selectedTask) {
+      onUpdateTask({
+        ...selectedTask,
+        ...data,
+        lastModifiedDate: new Date().toISOString(),
+      });
+    } else {
+      onAddTask({
+        ...data,
+        status: "PENDING",
+      });
+    }
+    onClose();
   };
 
   return (
     <Transition show={open}>
       <Dialog onClose={onClose} className="relative z-50">
-        {/* Animated backdrop */}
         <TransitionChild
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -65,10 +96,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
             leaveTo="opacity-0 scale-95 translate-y-4"
           >
             <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-black/5">
-              {/* Header with close button */}
               <div className="flex items-center justify-between mb-6">
                 <DialogTitle className="text-xl font-semibold text-gray-900">
-                  Add New Task
+                  {isEditMode ? "Update Task" : "Add New Task"}
                 </DialogTitle>
                 <button
                   onClick={onClose}
@@ -78,90 +108,67 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 </button>
               </div>
 
-              {/* Form with staggered animations */}
-              <div className="space-y-4">
-                <div className="group">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Task Title
                   </label>
                   <input
                     type="text"
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm placeholder-gray-400 transition-all duration-200 hover:border-gray-400 transform focus:scale-[1.02] focus:outline-none focus:ring-2 input-ring"
-                    style={{
-                      borderColor: "var(--focus-border, #d1d5db)",
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.setProperty(
-                        "--focus-border",
-                        "oklch(62.3% 0.214 259.815)"
-                      );
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.removeProperty("--focus-border");
-                    }}
+                    {...register("title", { required: "Title is required" })}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 input-ring"
                     placeholder="Enter task title..."
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
                   />
+                  {errors.title && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.title.message}
+                    </p>
+                  )}
                 </div>
 
-                <div className="group">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Description
                   </label>
                   <textarea
                     rows={4}
-                    className="input-ring w-full rounded-lg border border-gray-300 px-4 py-3 text-sm placeholder-gray-400 transition-all duration-200 hover:border-gray-400 resize-none transform focus:scale-[1.02] focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: "var(--focus-border, #d1d5db)",
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.setProperty(
-                        "--focus-border",
-                        "oklch(62.3% 0.214 259.815)"
-                      );
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.removeProperty("--focus-border");
-                    }}
+                    {...register("description", {
+                      required: "Description is required",
+                    })}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 resize-none input-ring"
                     placeholder="Describe your task..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
                   />
+                  {errors.description && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.description.message}
+                    </p>
+                  )}
                 </div>
-              </div>
 
-              {/* Action buttons */}
-              <div className="mt-8 flex justify-end gap-3">
-                <button
-                  onClick={onClose}
-                  className="rounded-lg bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-400/50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAdd}
-                  disabled={!title.trim() || !description.trim()}
-                  className="rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 shadow-lg"
-                  style={{
-                    backgroundColor: "oklch(62.3% 0.214 259.815)",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.backgroundColor =
-                        "oklch(58% 0.214 259.815)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!e.currentTarget.disabled) {
-                      e.currentTarget.style.backgroundColor =
-                        "oklch(62.3% 0.214 259.815)";
-                    }
-                  }}
-                >
-                  Add Task
-                </button>
-              </div>
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-lg bg-gray-100 px-6 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!isValid} // ✅ disable if form is invalid
+                    className={`rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-all duration-200 shadow-lg ${
+                      !isValid
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:scale-105 active:scale-95"
+                    }`}
+                    style={{
+                      backgroundColor: "oklch(62.3% 0.214 259.815)",
+                    }}
+                  >
+                    {isEditMode ? "Update Task" : "Add Task"}
+                  </button>
+                </div>
+              </form>
             </DialogPanel>
           </TransitionChild>
         </div>

@@ -13,7 +13,7 @@ const create = (data: Task) => {
   return http.post<Task>("/task", data);
 };
 
-const update = (id: string, data: Task) => {
+const update = (id: string | undefined, data: Task) => {
   return http.put<Task>(`/task/${id}`, data);
 };
 
