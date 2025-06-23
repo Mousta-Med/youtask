@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+/* Task Manager Styles */
+.dragging {
+    @apply opacity-60 rotate-2 scale-105;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+}
+
+.drag-over {
+    @apply bg-blue-50 dark:bg-blue-950/20 border-2 border-dashed border-blue-300 dark:border-blue-600 rounded-lg;
+}
+
+/* Better visual feedback for draggable items */
+[data-rfd-draggable-id] {
+    transition: transform 0.2s ease;
+}
