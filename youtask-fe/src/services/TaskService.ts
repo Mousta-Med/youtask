@@ -2,7 +2,7 @@ import http from "../http-common";
 import type { Task } from "../models/Task.model";
 
 const getAll = () => {
-  return http.get<Array<Task>>("/tasks");
+  return http.get<Array<Task>>("/task");
 };
 
 const get = (id: string) => {
