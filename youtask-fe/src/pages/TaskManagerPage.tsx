@@ -7,6 +7,7 @@ import TaskSection from "../components/TaskSection";
 import toast from "react-hot-toast";
 import AddTaskModal from "../components/AddTaskModal";
 import { AxiosError } from "axios";
+import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog";
 import {
   PlusIcon,
   ArrowPathIcon,
@@ -21,6 +22,12 @@ const TaskManagerPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const handleDeleteRequest = (task: Task) => {
+    setSelectedTask(task);
+    setDeleteDialogOpen(true);
+  };
 
   const handleEditTask = (task: Task) => {
     setSelectedTask(task);
@@ -58,10 +65,13 @@ const TaskManagerPage: React.FC = () => {
     }
   };
 
-  const handleDeleteTask = async (id: string) => {
+  const handleDeleteTask = async () => {
+    if (!selectedTask) return;
     try {
-      await TaskService.remove(id);
-      setTasks((prev) => prev.filter((task) => task.id !== id));
+      setDeleteDialogOpen(false);
+      setSelectedTask(null);
+      await TaskService.remove(selectedTask.id);
+      setTasks((prev) => prev.filter((task) => task.id !== selectedTask.id));
       toast.success("Task deleted successfully");
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
@@ -162,27 +172,17 @@ const TaskManagerPage: React.FC = () => {
         destination.droppableId as "PENDING" | "IN_PROGRESS" | "COMPLETED"
       );
     } else {
-      // Handle reordering within the same section
       const sourceStatus = source.droppableId as
         | "PENDING"
         | "IN_PROGRESS"
         | "COMPLETED";
       const sourceTasks = tasks.filter((task) => task.status === sourceStatus);
       const otherTasks = tasks.filter((task) => task.status !== sourceStatus);
-
-      // Create a new array with reordered tasks
       const reorderedSourceTasks = Array.from(sourceTasks);
       const [movedTask] = reorderedSourceTasks.splice(source.index, 1);
       reorderedSourceTasks.splice(destination.index, 0, movedTask);
-
-      // Combine all tasks back together
       const newTasks = [...otherTasks, ...reorderedSourceTasks];
-
-      // Update local state immediately for better UX
       setTasks(newTasks);
-
-      // Optional: Add API call here if your backend supports task ordering
-      // You could add a position field to your Task model and update it
     }
   };
 
@@ -226,6 +226,15 @@ const TaskManagerPage: React.FC = () => {
 
   return (
     <div className="p-4 mx-auto max-w-7xl md:p-6">
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteTask}
+        title="Delete Task"
+        message={`Are you sure you want to delete "${selectedTask?.title}"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <AddTaskModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -285,7 +294,7 @@ const TaskManagerPage: React.FC = () => {
                   tasks={taskGroups.PENDING}
                   count={taskCounts.PENDING}
                   onToggleComplete={toggleTaskComplete}
-                  onDelete={handleDeleteTask}
+                  onDeleteRequest={handleDeleteRequest}
                   onEdit={handleEditTask}
                 />
 
@@ -295,7 +304,7 @@ const TaskManagerPage: React.FC = () => {
                   tasks={taskGroups.IN_PROGRESS}
                   count={taskCounts.IN_PROGRESS}
                   onToggleComplete={toggleTaskComplete}
-                  onDelete={handleDeleteTask}
+                  onDeleteRequest={handleDeleteRequest}
                   onEdit={handleEditTask}
                 />
 
@@ -305,7 +314,7 @@ const TaskManagerPage: React.FC = () => {
                   tasks={taskGroups.COMPLETED}
                   count={taskCounts.COMPLETED}
                   onToggleComplete={toggleTaskComplete}
-                  onDelete={handleDeleteTask}
+                  onDeleteRequest={handleDeleteRequest}
                   onEdit={handleEditTask}
                 />
               </>

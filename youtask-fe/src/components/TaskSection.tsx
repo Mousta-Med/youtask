@@ -9,7 +9,7 @@ interface TaskSectionProps {
   tasks: Task[];
   count: number;
   onToggleComplete: (taskId: string) => void;
-  onDelete: (id: string) => void;
+  onDeleteRequest: (task: Task) => void;
   onEdit: (task: Task) => void;
 }
 
@@ -18,7 +18,7 @@ const TaskSection: React.FC<TaskSectionProps> = ({
   status,
   tasks,
   count,
-  onDelete,
+  onDeleteRequest,
   onEdit,
 }) => {
   const getSectionBadgeStyles = (
@@ -56,7 +56,7 @@ const TaskSection: React.FC<TaskSectionProps> = ({
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`min-h-[200px] transition-colors ${
+            className={`transition-colors ${
               snapshot.isDraggingOver ? "drag-over" : ""
             }`}
           >
@@ -65,7 +65,7 @@ const TaskSection: React.FC<TaskSectionProps> = ({
                 key={task.id || `task-${index}`}
                 task={task}
                 index={index}
-                onDelete={onDelete}
+                onDeleteRequest={onDeleteRequest}
                 onEdit={onEdit}
               />
             ))}

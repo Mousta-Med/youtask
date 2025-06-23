@@ -17,7 +17,7 @@ const update = (id: string | undefined, data: Task) => {
   return http.put<Task>(`/task/${id}`, data);
 };
 
-const remove = (id: string) => {
+const remove = (id: string | undefined) => {
   return http.delete<void>(`/task/${id}`);
 };
 

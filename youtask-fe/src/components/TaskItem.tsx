@@ -11,14 +11,14 @@ import {
 interface TaskItemProps {
   task: Task;
   index: number;
-  onDelete: (id: string) => void;
+  onDeleteRequest: (task: Task) => void;
   onEdit: (task: Task) => void;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({
   task,
   index,
-  onDelete,
+  onDeleteRequest,
   onEdit,
 }) => {
   const isCompleted = task.status === "COMPLETED";
@@ -38,12 +38,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className={`p-5 mb-4 bg-white border border-gray-200 rounded-xl shadow-sm dark:border-gray-800 dark:bg-white/5 ${
+          className={`p-3 mb-2 bg-white border border-gray-200 rounded-xl shadow-sm dark:border-gray-800 dark:bg-white/5 ${
             snapshot.isDragging ? "dragging" : ""
           }`}
         >
-          <div className="flex flex-col gap-4">
-            <div className="group flex items-start gap-4 transition-all duration-200">
+          <div className="flex flex-col gap-2">
+            <div className="group flex items-center gap-4 transition-all duration-200">
               <span
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing mt-1 transition-colors duration-200"
                 {...provided.dragHandleProps}
@@ -86,7 +86,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                     </button>
 
                     <button
-                      onClick={() => onDelete(task.id!)}
+                      onClick={() => onDeleteRequest(task)}
                       className="p-2 text-gray-400 hover:text-red-600 dark:text-gray-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all duration-200"
                       aria-label="Delete task"
                       title="Delete task"
