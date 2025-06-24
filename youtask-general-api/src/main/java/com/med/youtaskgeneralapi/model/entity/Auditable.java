@@ -31,7 +31,7 @@ public abstract class Auditable {
     @CreatedDate
     @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    protected LocalDateTime CreatedDate;
+    protected LocalDateTime createdDate;
     @LastModifiedBy
     protected String lastModifiedBy;
     @LastModifiedDate

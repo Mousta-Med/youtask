@@ -1,6 +1,7 @@
 import "./App.css";
 import NavBar from "./components/NavBar";
 import TaskManagerPage from "./pages/TaskManagerPage";
+import NotFound from "./pages/NotFound";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
@@ -10,6 +11,7 @@ function App() {
       <NavBar />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Routes>
+          <Route path="*" element={<NotFound />} />
           <Route path="/" element={<TaskManagerPage />} />
         </Routes>
       </div>

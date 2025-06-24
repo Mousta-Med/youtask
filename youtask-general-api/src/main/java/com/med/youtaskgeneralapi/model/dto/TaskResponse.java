@@ -16,7 +16,7 @@ public class TaskResponse {
     private String description;
     private TaskStatus status;
     private String createdBy;
-    private LocalDateTime CreatedDate;
+    private LocalDateTime createdDate;
     private String lastModifiedBy;
     private LocalDateTime lastModifiedDate;
 
