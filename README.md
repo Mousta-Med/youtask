@@ -25,7 +25,7 @@ youtask/
 
 Before running this application, make sure you have the following installed:
 
-- **Java 24** or higher
+- **Java 20**
 - **Node.js 18** or higher
 - **npm**
 - **PostgreSQL 17**
@@ -33,21 +33,65 @@ Before running this application, make sure you have the following installed:
 
 ## 🛠️ Setup Instructions
 
-### 1. Clone the Repository
+### 🐳 Option 1: Docker Setup
+
+This is the easiest way to run the entire application with a single command.
+
+#### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Mousta-Med/youtask
 cd youtask
 ```
 
-### 2. Database Setup
+#### 2. Run with Docker Compose
 
-#### Install PostgreSQL
+```bash
+# Build and start all services
+docker compose up --build
+
+# Or run in detached mode
+docker compose up --build -d
+```
+
+This will start:
+- **PostgreSQL Database** on port `5432`
+- **Spring Boot API** on port `8080`
+- **React Frontend** on port `5173`
+
+#### 3. Access the Application
+
+- **Frontend:** http://localhost:5173
+- **API:** http://localhost:8080
+- **API Documentation (Swagger):** http://localhost:8080/swagger-ui.html
+
+#### 4. Stop the Application
+
+```bash
+# Stop all services
+docker compose down
+
+# Stop and remove volumes (this will delete database data)
+docker compose down -v
+```
+
+### 🔧 Option 2: Manual Setup
+
+#### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Mousta-Med/youtask
+cd youtask
+```
+
+#### 2. Database Setup
+
+##### Install PostgreSQL
 
 - Download and install PostgreSQL from [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 - Start the PostgreSQL service
 
-#### Create Database and User
+##### Create Database and User
 
 ```sql
 -- Connect to PostgreSQL as superuser
@@ -64,19 +108,19 @@ GRANT ALL PRIVILEGES ON DATABASE youtask TO youtask_user;
 \q
 ```
 
-#### Initialize Database Schema
+##### Initialize Database Schema
 
 ```bash
-# Navigate to the API directory
+# Navigate to the root directory
 cd youtask
 
 # Run the schema script
 psql -U postgres -d youtask -f schema.sql
 ```
 
-### 3. Backend Setup (Spring Boot API)
+#### 3. Backend Setup (Spring Boot API)
 
-#### Configure Database Connection
+##### Configure Database Connection
 
 Update `youtask-general-api/src/main/resources/application.yml`:
 
@@ -96,7 +140,7 @@ spring:
         format_sql: true
 ```
 
-#### Build and Run the Backend
+##### Build and Run the Backend
 
 ```bash
 # Navigate to API directory
@@ -113,7 +157,7 @@ The API will be available at: `http://localhost:8080`
 
 **API Documentation (Swagger):** `http://localhost:8080/swagger-ui.html`
 
-### 4. Frontend Setup (React Application)
+#### 4. Frontend Setup (React Application)
 
 ```bash
 # Navigate to frontend directory
