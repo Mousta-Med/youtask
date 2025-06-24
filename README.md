@@ -25,6 +25,10 @@ youtask/
 
 Before running this application, make sure you have the following installed:
 
+### Option 1: Docker Setup 
+- **Docker** and **Docker Compose**
+
+### Option 2: Manual Setup
 - **Java 20**
 - **Node.js 18** or higher
 - **npm**
