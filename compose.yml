@@ -1,0 +1,40 @@
+services:
+  postgresdb:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=youtask
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+  youtask-general-api:
+    depends_on:
+      - postgresdb
+    build: ./youtask-general-api
+    container_name: serverside
+    image: youtask-general-api
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:postgresql://postgresdb:5432/youtask",
+        "spring.datasource.username" : "postgres",
+        "spring.datasource.password" : "root"
+      }'
+    stdin_open: true
+    tty: true
+  youtask-fe:
+    build: ./youtask-fe
+    container_name: clientside
+    image: youtask-fe
+    ports:
+      - "5173:5173"
+    links:
+      - youtask-general-api
+    working_dir: /youtask-fe
+volumes:
+  db:
+    driver: local
