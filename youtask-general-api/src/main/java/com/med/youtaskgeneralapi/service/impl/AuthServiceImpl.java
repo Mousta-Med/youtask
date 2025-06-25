@@ -1,5 +1,6 @@
 package com.med.youtaskgeneralapi.service.impl;
 
+import com.med.youtaskgeneralapi.jwt.JWTUtil;
 import com.med.youtaskgeneralapi.model.dto.AuthRequest;
 import com.med.youtaskgeneralapi.model.dto.AuthResponse;
 import com.med.youtaskgeneralapi.model.dto.UserRequest;
@@ -58,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> user = userRepository.findByUsernameOrEmail(emailOrUsername, emailOrUsername);
 
         if (user.isPresent()) {
-            token = jwtUtil.generateToken(user.get().getUsername());
+            token = jwtUtil.generateToken(user.get(), "USER");
             return new AuthResponse(token);
         }
         throw new UsernameNotFoundException("User Not Found With This Credential: " + authRequest.getEmailOrUsername());
