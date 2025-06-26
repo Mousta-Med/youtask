@@ -168,12 +168,6 @@ const Login: React.FC = () => {
 
           {/* Footer Links */}
           <div className="mt-6 text-center space-y-3">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-            >
-              Forgot your password?
-            </Link>
             <div className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{" "}
               <Link

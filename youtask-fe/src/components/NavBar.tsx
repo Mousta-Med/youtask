@@ -20,6 +20,30 @@ function classNames(...classes: (string | undefined | null | false)[]): string {
 
 export default function NavBar() {
   const navigate = useNavigate();
+
+  // Check if user is authenticated
+  const isAuthenticated = () => {
+    const token = localStorage.getItem("accessToken");
+    return !!token;
+  };
+
+  // Get current user from localStorage
+  const getCurrentUser = () => {
+    try {
+      const userStr = localStorage.getItem("user");
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (error) {
+      return error;
+    }
+  };
+
+  // Don't render NavBar if user is not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
+
+  const user = getCurrentUser();
+
   const handleLogout = async () => {
     try {
       await AuthService.logout();
@@ -79,6 +103,15 @@ export default function NavBar() {
             </div>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 space-x-4">
+            {/* User Info */}
+            {user && (
+              <div className="hidden sm:flex items-center text-sm text-gray-300">
+                <span>
+                  Welcome, {user.firstName || user.username || "User"}
+                </span>
+              </div>
+            )}
+
             {/* Logout Button */}
             <button
               onClick={handleLogout}
