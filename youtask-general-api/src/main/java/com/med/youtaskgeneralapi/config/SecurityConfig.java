@@ -62,7 +62,7 @@ public class SecurityConfig {
                 "/h2-console/**",
                 "/api/users/generate",
                 "/api/users/batch",
-                "/api/auth",
+                "/api/v1/auth/*",
                 "/swagger-ui/**",
                 "/swagger-resources",
                 "/swagger-resources/**",
