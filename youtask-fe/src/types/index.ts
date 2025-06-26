@@ -1,5 +1,5 @@
 export interface AuthRequest {
-  emailOrusername: string;
+  emailOrUsername: string;
   password: string;
 }
 
@@ -10,5 +10,5 @@ export interface UserRequest {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
 }

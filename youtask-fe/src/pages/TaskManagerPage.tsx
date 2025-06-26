@@ -86,10 +86,16 @@ const TaskManagerPage: React.FC = () => {
 
   const fetchTasks = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const response = await TaskService.getAll();
-      setTasks(response.data || []);
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        setLoading(true);
+        setError(null);
+        const response = await TaskService.getAll();
+        setTasks(response.data || []);
+      } else {
+        setError("You must be logged in to view tasks");
+        toast.error("You must be logged in to view tasks");
+      }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
       const errorMessage =

@@ -9,9 +9,15 @@ const register = (data: UserRequest) => {
   return http.post<AuthResponse>("/auth/register", data);
 };
 
+const logout = () => {
+  localStorage.removeItem("accessToken");
+  return Promise.resolve();
+};
+
 const AuthService = {
   login,
   register,
+  logout,
 };
 
 export default AuthService;
