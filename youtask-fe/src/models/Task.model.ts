@@ -8,7 +8,3 @@ export interface Task {
   lastModifiedBy?: string;
   lastModifiedDate?: string;
 }
-
-export interface TaskGroup {
-  [key: string]: Task[];
-}
