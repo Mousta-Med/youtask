@@ -26,7 +26,7 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
   }, []);
 
   if (isAuthenticated === true) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/tasks" replace />;
   }
 
   return <>{children}</>;

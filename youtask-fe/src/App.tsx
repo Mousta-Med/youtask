@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import Home from "./pages/HomePage";
 
 function App() {
   return (
@@ -16,6 +17,14 @@ function App() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Routes>
           <Route path="*" element={<NotFound />} />
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <Home />
+              </PublicRoute>
+            }
+          />
           <Route
             path="/login"
             element={
@@ -33,7 +42,7 @@ function App() {
             }
           />
           <Route
-            path="/"
+            path="/tasks"
             element={
               <ProtectedRoute>
                 <TaskManagerPage />
