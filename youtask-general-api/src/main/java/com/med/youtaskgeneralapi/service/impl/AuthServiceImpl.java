@@ -4,6 +4,7 @@ import com.med.youtaskgeneralapi.jwt.JWTUtil;
 import com.med.youtaskgeneralapi.model.dto.AuthRequest;
 import com.med.youtaskgeneralapi.model.dto.AuthResponse;
 import com.med.youtaskgeneralapi.model.dto.UserRequest;
+import com.med.youtaskgeneralapi.model.dto.UserResponse;
 import com.med.youtaskgeneralapi.model.entity.User;
 import com.med.youtaskgeneralapi.repository.UserRepository;
 import com.med.youtaskgeneralapi.service.AuthService;
@@ -41,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(UserRequest.getPassword()));
         user = userRepository.save(user);
         String token = jwtUtil.generateToken(user, "USER");
-        return new AuthResponse(token);
+        return new AuthResponse(token,  modelMapper.map(user, UserResponse.class));
 
     }
 
@@ -60,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (user.isPresent()) {
             token = jwtUtil.generateToken(user.get(), "USER");
-            return new AuthResponse(token);
+            return new AuthResponse(token,  modelMapper.map(user, UserResponse.class));
         }
         throw new UsernameNotFoundException("User Not Found With This Credential: " + authRequest.getEmailOrUsername());
 
