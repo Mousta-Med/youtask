@@ -67,4 +67,13 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.findById(uuid).orElseThrow(() -> new NoSuchElementException("Task Not found with this: " + uuid));
         taskRepository.deleteById(uuid);
     }
+
+    @Override
+    public List<TaskResponse> findAllByUserId(UUID id) {
+        return taskRepository
+                .findAllByUserId(id)
+                .stream()
+                .map(task -> modelMapper.map(task, TaskResponse.class))
+                .collect(Collectors.toList());
+    }
 }

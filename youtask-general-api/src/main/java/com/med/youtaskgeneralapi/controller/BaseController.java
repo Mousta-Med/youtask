@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public abstract class BaseController<Request, Id, Response, Service extends BaseService<Request, Id, Response>> {
@@ -25,6 +26,10 @@ public abstract class BaseController<Request, Id, Response, Service extends Base
         return ResponseEntity.ok(service.findAll());
     }
 
+    @GetMapping("/all/{id}")
+    public ResponseEntity<List<Response>> findAllByUserId(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.findAllByUserId(id));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Response> findOne(@PathVariable Id id) {
