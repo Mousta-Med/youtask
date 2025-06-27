@@ -43,9 +43,18 @@ This is the easiest way to run the entire application with a single command.
 
 #### 1. Clone the Repository
 
+##### Option 1: Without security
+
 ```bash
 git clone https://github.com/Mousta-Med/youtask
 cd youtask
+```
+##### Option 2: With security
+
+```bash
+git clone https://github.com/Mousta-Med/youtask
+cd youtask
+git switch with-security
 ```
 
 #### 2. Run with Docker Compose
