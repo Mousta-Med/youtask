@@ -56,7 +56,7 @@ const Register: React.FC = () => {
       if (accessToken) {
         localStorage.setItem("accessToken", accessToken);
         toast.success("Account created successfully!");
-        navigate("/", { replace: true });
+        navigate("/tasks", { replace: true });
       } else {
         throw new Error("Invalid response from server");
       }
