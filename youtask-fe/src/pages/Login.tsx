@@ -22,7 +22,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || "/tasks";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -43,8 +43,10 @@ const Login: React.FC = () => {
         password: formData.password,
       });
       const { accessToken } = response.data;
+      const { user } = response.data;
       if (accessToken) {
         localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
         toast.success("Login successful!");
         navigate(from, { replace: true });
       } else {
