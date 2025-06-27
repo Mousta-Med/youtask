@@ -1,5 +1,6 @@
 package com.med.youtaskgeneralapi.model.dto;
 
+import com.med.youtaskgeneralapi.model.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,5 +11,7 @@ import lombok.Setter;
 public class AuthResponse {
 
     private String accessToken;
+
+    private UserResponse user;
 
 }
