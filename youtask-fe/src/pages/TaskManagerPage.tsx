@@ -91,11 +91,13 @@ const TaskManagerPage: React.FC = () => {
   const fetchTasks = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-      const user = localStorage.getItem("user") || "{}";
+      const user = localStorage.getItem("user");
+      const id = user ? JSON.parse(user).id : null;
       if (token) {
         setLoading(true);
         setError(null);
-        setTasks(JSON.parse(user).tasks || []);
+        const response = await TaskService.getAllByUserId(id);
+        setTasks(response.data.reverse() || []);
       } else {
         setError("You must be logged in to view tasks");
         toast.error("You must be logged in to view tasks");

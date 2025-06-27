@@ -5,6 +5,10 @@ const getAll = () => {
   return http.get<Array<Task>>("/task");
 };
 
+const getAllByUserId = (id: string) => {
+  return http.get<Array<Task>>(`/task/all/${id}`);
+};
+
 const get = (id: string) => {
   return http.get<Task>(`/task/${id}`);
 };
@@ -23,6 +27,7 @@ const remove = (id: string | undefined) => {
 
 const TaskService = {
   getAll,
+  getAllByUserId,
   get,
   create,
   update,
