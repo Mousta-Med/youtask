@@ -1,8 +1,23 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { ExclamationTriangleIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ExclamationTriangleIcon,
+  HomeIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
 
 const NotFound: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    // Go back to previous page, or home if no history
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <div className="flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -31,9 +46,17 @@ const NotFound: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="space-y-3">
+            <button
+              onClick={handleGoBack}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg transition px-4 py-3 text-sm bg-blue-500 text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <ArrowLeftIcon className="w-4 h-4" />
+              Go Back
+            </button>
+
             <Link
               to="/"
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg transition px-4 py-3 text-sm bg-blue-500 text-white shadow-sm hover:bg-blue-600 disabled:bg-blue-300"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg transition px-4 py-3 text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               <HomeIcon className="w-4 h-4" />
               Back to Home

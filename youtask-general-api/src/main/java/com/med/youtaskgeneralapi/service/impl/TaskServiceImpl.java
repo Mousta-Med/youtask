@@ -3,7 +3,9 @@ package com.med.youtaskgeneralapi.service.impl;
 import com.med.youtaskgeneralapi.model.dto.TaskRequest;
 import com.med.youtaskgeneralapi.model.dto.TaskResponse;
 import com.med.youtaskgeneralapi.model.entity.Task;
+import com.med.youtaskgeneralapi.model.entity.User;
 import com.med.youtaskgeneralapi.repository.TaskRepository;
+import com.med.youtaskgeneralapi.repository.UserRepository;
 import com.med.youtaskgeneralapi.service.TaskService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,17 +22,21 @@ import java.util.stream.Collectors;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public TaskServiceImpl(TaskRepository taskRepository,  ModelMapper modelMapper) {
+    public TaskServiceImpl(TaskRepository taskRepository,  ModelMapper modelMapper, UserRepository userRepository) {
         this.taskRepository =  taskRepository;
         this.modelMapper = modelMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
     public TaskResponse save(TaskRequest taskrequest) {
+        Optional<User> user = userRepository.findById(taskrequest.getUserId());
         Task task = modelMapper.map(taskrequest, Task.class);
+        user.ifPresent(task::setUser);
         return modelMapper.map(taskRepository.save(task), TaskResponse.class);
     }
 
@@ -59,5 +66,14 @@ public class TaskServiceImpl implements TaskService {
     public void delete(UUID uuid) {
         taskRepository.findById(uuid).orElseThrow(() -> new NoSuchElementException("Task Not found with this: " + uuid));
         taskRepository.deleteById(uuid);
+    }
+
+    @Override
+    public List<TaskResponse> findAllByUserId(UUID id) {
+        return taskRepository
+                .findAllByUserId(id)
+                .stream()
+                .map(task -> modelMapper.map(task, TaskResponse.class))
+                .collect(Collectors.toList());
     }
 }

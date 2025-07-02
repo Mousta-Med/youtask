@@ -35,6 +35,8 @@ const TaskManagerPage: React.FC = () => {
   };
 
   const handleUpdateTask = async (updatedTask: Task) => {
+    const user = localStorage.getItem("user");
+    updatedTask.userId = user ? JSON.parse(user).id : null;
     try {
       const response = await TaskService.update(updatedTask.id, updatedTask);
       const updatedTaskData = response.data;
@@ -51,6 +53,8 @@ const TaskManagerPage: React.FC = () => {
   };
 
   const handleAddTask = async (newTask: Task) => {
+    const user = localStorage.getItem("user");
+    newTask.userId = user ? JSON.parse(user).id : null;
     try {
       const response = await TaskService.create(newTask);
       const createdTask = response.data;
@@ -86,10 +90,18 @@ const TaskManagerPage: React.FC = () => {
 
   const fetchTasks = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const response = await TaskService.getAll();
-      setTasks(response.data || []);
+      const token = localStorage.getItem("accessToken");
+      const user = localStorage.getItem("user");
+      const id = user ? JSON.parse(user).id : null;
+      if (token) {
+        setLoading(true);
+        setError(null);
+        const response = await TaskService.getAllByUserId(id);
+        setTasks(response.data.reverse() || []);
+      } else {
+        setError("You must be logged in to view tasks");
+        toast.error("You must be logged in to view tasks");
+      }
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
       const errorMessage =
@@ -104,14 +116,14 @@ const TaskManagerPage: React.FC = () => {
   };
 
   const updateTaskStatus = async (id: string, status: Task["status"]) => {
+    const user = localStorage.getItem("user");
     try {
       const currentTask = tasks.find((task) => task.id === id);
       if (!currentTask) return;
-
+      currentTask.userId = user ? JSON.parse(user).id : null;
       const updatedTaskData = {
         ...currentTask,
         status,
-        lastModifiedDate: new Date().toISOString(),
       };
 
       const response = await TaskService.update(id, updatedTaskData);

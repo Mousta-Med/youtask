@@ -3,7 +3,14 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
+import AuthService from "../services/AuthService";
+import toast from "react-hot-toast";
 
 const navigation = [{ name: "Tasks", href: "#", current: true }];
 
@@ -12,6 +19,42 @@ function classNames(...classes: (string | undefined | null | false)[]): string {
 }
 
 export default function NavBar() {
+  const navigate = useNavigate();
+
+  // Check if user is authenticated
+  const isAuthenticated = () => {
+    const token = localStorage.getItem("accessToken");
+    return !!token;
+  };
+
+  // Get current user from localStorage
+  const getCurrentUser = () => {
+    try {
+      const userStr = localStorage.getItem("user");
+      return userStr ? JSON.parse(userStr) : null;
+    } catch (error) {
+      return error;
+    }
+  };
+
+  // Don't render NavBar if user is not authenticated
+  if (!isAuthenticated()) {
+    return null;
+  }
+
+  const user = getCurrentUser();
+
+  const handleLogout = async () => {
+    try {
+      await AuthService.logout();
+      toast.success("Logged out successfully!");
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Error logging out");
+    }
+  };
+
   return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -59,13 +102,24 @@ export default function NavBar() {
               </div>
             </div>
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <a
-              href="#"
-              className="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0 space-x-4">
+            {/* User Info */}
+            {user && (
+              <div className="hidden sm:flex items-center text-sm text-gray-300">
+                <span>
+                  Welcome, {user.firstName || user.username || "User"}
+                </span>
+              </div>
+            )}
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
             >
+              <ArrowRightOnRectangleIcon className="h-4 w-4" />
               Logout
-            </a>
+            </button>
           </div>
         </div>
       </div>

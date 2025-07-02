@@ -1,3 +1,5 @@
+import type { User } from "./User.model";
+
 export interface Task {
   id?: string;
   title: string;
@@ -7,8 +9,6 @@ export interface Task {
   createdBy?: string;
   lastModifiedBy?: string;
   lastModifiedDate?: string;
-}
-
-export interface TaskGroup {
-  [key: string]: Task[];
+  user?: User;
+  userId?: string;
 }

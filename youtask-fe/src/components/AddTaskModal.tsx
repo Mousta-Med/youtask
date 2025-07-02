@@ -101,6 +101,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
                   {isEditMode ? "Update Task" : "Add New Task"}
                 </DialogTitle>
                 <button
+                  title="Close"
                   onClick={onClose}
                   className="rounded-lg p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-200"
                 >
@@ -156,14 +157,11 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
                   <button
                     type="submit"
                     disabled={!isValid} // ✅ disable if form is invalid
-                    className={`rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-all duration-200 shadow-lg ${
+                    className={`bg-[#2b7fff] rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-all duration-200 shadow-lg ${
                       !isValid
                         ? "opacity-50 cursor-not-allowed"
                         : "hover:scale-105 active:scale-95"
                     }`}
-                    style={{
-                      backgroundColor: "oklch(62.3% 0.214 259.815)",
-                    }}
                   >
                     {isEditMode ? "Update Task" : "Add Task"}
                   </button>
